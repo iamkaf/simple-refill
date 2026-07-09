@@ -1,0 +1,136 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.set-versions.outputs.versions }}
+      build-matrix: ${{ steps.set-versions.outputs.build-matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed versions
+        id: set-versions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          all_versions=$(find versions -mindepth 2 -maxdepth 2 -type f -name gradle.properties -printf '%h\n' | xargs -r -n1 basename | sort -V)
+
+          changed_files=""
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            changed_files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          elif [ "${{ github.event_name }}" = "push" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            changed_files=$(git diff --name-only "${{ github.event.before }}...${{ github.sha }}")
+          fi
+
+          if [ -z "$changed_files" ] || printf '%s\n' "$changed_files" | grep -Eq '^(common|fabric|forge|neoforge|gradle|\.github/workflows|settings\.gradle\.kts|stonecutter\.gradle\.kts|gradle\.properties|justfile|gradlew|gradlew\.bat)(/|$)'; then
+            versions="$all_versions"
+          else
+            changed_versions=$(printf '%s\n' "$changed_files" | sed -nE 's|^versions/([^/]+)/.*|\1|p' | sort -u)
+            versions=$(comm -12 <(printf '%s\n' "$all_versions") <(printf '%s\n' "$changed_versions"))
+          fi
+
+          versions_json=$(printf '%s\n' "$versions" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          build_matrix=$(printf '%s\n' "$versions" | while IFS= read -r version; do
+            [ -n "$version" ] || continue
+            props="versions/$version/gradle.properties"
+            enabled_loaders=$(sed -nE 's/^project\.enabled-loaders=(.*)$/\1/p' "$props" | head -n1)
+
+            for loader in fabric forge neoforge; do
+              [ -f "$loader/build.gradle.kts" ] || continue
+              if printf '%s\n' "$enabled_loaders" | tr ',' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -Fxq "$loader"; then
+                jq -cn --arg version "$version" --arg loader "$loader" --arg node "$version-$loader" '{version: $version, loader: $loader, node: $node}'
+              fi
+            done
+          done | jq -s -c '.')
+
+          echo "versions=$versions_json" >> "$GITHUB_OUTPUT"
+          echo "build-matrix=$build_matrix" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.build-matrix != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.detect-changes.outputs.build-matrix) }}
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Java version
+        id: java
+        shell: bash
+        run: |
+          set -euo pipefail
+          props="versions/${{ matrix.version }}/gradle.properties"
+          v=$(sed -nE 's/^project\.build-java=([0-9]+).*/\1/p' "$props" | head -n1)
+          if [ -z "$v" ]; then
+            v=$(sed -nE 's/^project\.java=([0-9]+).*/\1/p' "$props" | head -n1)
+          fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ steps.java.outputs.version }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Setup just
+        uses: taiki-e/install-action@just
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build ${{ matrix.node }}
+        run: just build ${{ matrix.node }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}-${{ matrix.node }}
+          path: ${{ matrix.loader }}/versions/${{ matrix.version }}/build/libs/*.jar
+          if-no-files-found: error
+
+  compile:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.versions != '[]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Setup just
+        uses: taiki-e/install-action@just
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Compile all nodes
+        run: just compile-all
