@@ -9,8 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added automatic main-hand and off-hand refills for depleted blocks,
-  consumables, and broken tools.
-- Added component-safe matching and configurable refill categories.
-- Added Fabric, Forge, and NeoForge support for Minecraft 1.21.1, 1.21.11,
-  26.1.2, and 26.2.
+- Initial Release
