@@ -11,6 +11,7 @@
     "sources": "https://github.com/iamkaf/simple-refill"
   },
   "license": "${license}",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": ["com.iamkaf.simplerefill.fabric.SimpleRefillFabric"]
