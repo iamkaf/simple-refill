@@ -1,14 +1,10 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.iamkaf.simplerefill.mixin",
+  "package": "com.iamkaf.minirefill.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "ItemStackMixin",
-    "LivingEntityMixin",
-    "ServerPlayerGameModeMixin"
-  ],
+  "mixins": [],
   "client": [],
   "server": [],
   "injectors": {

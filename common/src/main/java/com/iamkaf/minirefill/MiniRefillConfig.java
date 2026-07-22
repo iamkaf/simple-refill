@@ -1,4 +1,4 @@
-package com.iamkaf.simplerefill;
+package com.iamkaf.minirefill;
 
 import com.iamkaf.konfig.api.v1.ConfigBuilder;
 import com.iamkaf.konfig.api.v1.ConfigHandle;
@@ -7,7 +7,7 @@ import com.iamkaf.konfig.api.v1.ConfigValue;
 import com.iamkaf.konfig.api.v1.Konfig;
 import com.iamkaf.konfig.api.v1.SyncMode;
 
-public final class SimpleRefillConfig {
+public final class MiniRefillConfig {
     public static final ConfigHandle HANDLE;
     public static final ConfigValue<Boolean> REFILL_BLOCKS;
     public static final ConfigValue<Boolean> REFILL_TOOLS;
@@ -16,7 +16,7 @@ public final class SimpleRefillConfig {
     public static final ConfigValue<Boolean> SEARCH_HOTBAR_FIRST;
 
     static {
-        ConfigBuilder builder = Konfig.builder(SimpleRefill.MOD_ID, "common")
+        ConfigBuilder builder = Konfig.builder(MiniRefill.MOD_ID, "common")
                 .scope(ConfigScope.COMMON)
                 .syncMode(SyncMode.LOGIN)
                 .comment("Server-authoritative refill settings.");
@@ -52,7 +52,7 @@ public final class SimpleRefillConfig {
         HANDLE = builder.build();
     }
 
-    private SimpleRefillConfig() {
+    private MiniRefillConfig() {
     }
 
     public static void init() {

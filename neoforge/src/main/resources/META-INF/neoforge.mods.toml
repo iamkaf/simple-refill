@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "${neoforge_loader_version_range}"
 license = "${license}"
-issueTrackerURL = "https://github.com/iamkaf/simple-refill/issues"
+issueTrackerURL = "https://github.com/iamkaf/minirefill/issues"
 
 [[mods]]
 modId = "${mod_id}"

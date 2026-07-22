@@ -1,6 +1,6 @@
-package com.iamkaf.simplerefill.mixin;
+package com.iamkaf.minirefill.mixin;
 
-import com.iamkaf.simplerefill.RefillQueue;
+import com.iamkaf.minirefill.RefillQueue;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -17,11 +17,11 @@ import java.util.ArrayDeque;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
     @Unique
-    private static final ThreadLocal<ArrayDeque<ItemStack>> SIMPLEREFILL_DAMAGE_CAPTURES =
+    private static final ThreadLocal<ArrayDeque<ItemStack>> MINIREFILL_DAMAGE_CAPTURES =
             ThreadLocal.withInitial(ArrayDeque::new);
 
     @Inject(method = "hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V", at = @At("HEAD"))
-    private void simplerefill$captureDamage(
+    private void minirefill$captureDamage(
             int amount,
             LivingEntity owner,
             EquipmentSlot slot,
@@ -32,19 +32,19 @@ public abstract class ItemStackMixin {
                 && player.getItemBySlot(slot) == (Object) this) {
             template = ((ItemStack) (Object) this).copy();
         }
-        SIMPLEREFILL_DAMAGE_CAPTURES.get().push(template);
+        MINIREFILL_DAMAGE_CAPTURES.get().push(template);
     }
 
     @Inject(method = "hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;)V", at = @At("RETURN"))
-    private void simplerefill$queueDamage(
+    private void minirefill$queueDamage(
             int amount,
             LivingEntity owner,
             EquipmentSlot slot,
             CallbackInfo callback) {
-        ArrayDeque<ItemStack> captures = SIMPLEREFILL_DAMAGE_CAPTURES.get();
+        ArrayDeque<ItemStack> captures = MINIREFILL_DAMAGE_CAPTURES.get();
         ItemStack template = captures.pop();
         if (captures.isEmpty()) {
-            SIMPLEREFILL_DAMAGE_CAPTURES.remove();
+            MINIREFILL_DAMAGE_CAPTURES.remove();
         }
         if (!template.isEmpty() && owner instanceof ServerPlayer player) {
             InteractionHand hand = slot == EquipmentSlot.MAINHAND ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;

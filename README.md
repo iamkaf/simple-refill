@@ -1,6 +1,6 @@
-# Simple Refill
+# minirefill
 
-Simple Refill moves a matching inventory stack into the hand that just ran
+minirefill moves a matching inventory stack into the hand that just ran
 out. It handles placed blocks, consumed items, and broken held tools on the
 logical server, preserving stack components and counts exactly.
 
@@ -13,7 +13,7 @@ logical server, preserving stack components and counts exactly.
 - Configurable feature categories and inventory search order.
 - No shulker-box, bundle, armor-slot, cursor-stack, or open-container scans.
 
-Generic right-click items are disabled by default. Simple Refill only reacts
+Generic right-click items are disabled by default. minirefill only reacts
 to item-use and durability events; dropping or otherwise clearing a hand does
 not trigger a refill.
 

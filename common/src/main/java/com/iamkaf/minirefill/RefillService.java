@@ -1,4 +1,4 @@
-package com.iamkaf.simplerefill;
+package com.iamkaf.minirefill;
 
 import com.iamkaf.amber.api.functions.v1.PlayerFunctions;
 import net.minecraft.server.level.ServerPlayer;
@@ -52,7 +52,7 @@ public final class RefillService {
             int selectedSlot,
             ItemStack template,
             RefillCategory category) {
-        if (SimpleRefillConfig.SEARCH_HOTBAR_FIRST.get()) {
+        if (MiniRefillConfig.SEARCH_HOTBAR_FIRST.get()) {
             int hotbar = findInHotbar(inventory, selectedSlot, template, category);
             return hotbar >= 0 ? hotbar : findInMainInventory(inventory, template, category);
         }
@@ -120,10 +120,10 @@ public final class RefillService {
 
         boolean enabled() {
             return switch (this) {
-                case BLOCK -> SimpleRefillConfig.REFILL_BLOCKS.get();
-                case TOOL -> SimpleRefillConfig.REFILL_TOOLS.get();
-                case CONSUMABLE -> SimpleRefillConfig.REFILL_CONSUMABLES.get();
-                case GENERIC -> SimpleRefillConfig.REFILL_GENERIC_USE_ITEMS.get();
+                case BLOCK -> MiniRefillConfig.REFILL_BLOCKS.get();
+                case TOOL -> MiniRefillConfig.REFILL_TOOLS.get();
+                case CONSUMABLE -> MiniRefillConfig.REFILL_CONSUMABLES.get();
+                case GENERIC -> MiniRefillConfig.REFILL_GENERIC_USE_ITEMS.get();
             };
         }
     }

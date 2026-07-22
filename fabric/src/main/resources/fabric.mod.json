@@ -6,15 +6,15 @@
   "description": "${description}",
   "authors": ["${mod_author}"],
   "contact": {
-    "homepage": "https://github.com/iamkaf/simple-refill",
-    "issues": "https://github.com/iamkaf/simple-refill/issues",
-    "sources": "https://github.com/iamkaf/simple-refill"
+    "homepage": "https://github.com/iamkaf/minirefill",
+    "issues": "https://github.com/iamkaf/minirefill/issues",
+    "sources": "https://github.com/iamkaf/minirefill"
   },
   "license": "${license}",
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.iamkaf.simplerefill.fabric.SimpleRefillFabric"]
+    "main": ["com.iamkaf.minirefill.fabric.MiniRefillFabric"]
   },
   "mixins": [
     "${mod_id}.mixins.json",

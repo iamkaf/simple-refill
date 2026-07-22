@@ -14,7 +14,7 @@ describe.configure({
   ],
 });
 
-describe("Simple Refill", () => {
+describe("minirefill", () => {
   test("refills placed blocks in both hands without creating items", async (ctx) => {
     await prepare(ctx);
     await ctx.player.inventory().selectHotbar(0);
@@ -42,8 +42,8 @@ describe("Simple Refill", () => {
     await prepare(ctx);
     await ctx.player.inventory().selectHotbar(0);
     await ctx.commands.batch([
-      "/item replace entity @s weapon.mainhand with minecraft:stone[minecraft:custom_data={simplerefill_marker:1b}] 1",
-      "/item replace entity @s inventory.0 with minecraft:stone[minecraft:custom_data={simplerefill_marker:2b}] 8",
+      "/item replace entity @s weapon.mainhand with minecraft:stone[minecraft:custom_data={minirefill_marker:1b}] 1",
+      "/item replace entity @s inventory.0 with minecraft:stone[minecraft:custom_data={minirefill_marker:2b}] 8",
     ]);
     await ctx.player.useBlock(placementTarget, { face: "up", hand: "main_hand" });
     await ctx.runtime.wait(500);
@@ -51,7 +51,7 @@ describe("Simple Refill", () => {
     await ctx.commands.assert("/execute unless items entity @a[limit=1] weapon.mainhand *");
     await ctx.commands.assert("/execute if items entity @a[limit=1] inventory.0 minecraft:stone[count=8]");
     await ctx.commands.assert(
-      "/execute if items entity @a[limit=1] inventory.0 minecraft:stone[minecraft:custom_data~{simplerefill_marker:2b}]",
+      "/execute if items entity @a[limit=1] inventory.0 minecraft:stone[minecraft:custom_data~{minirefill_marker:2b}]",
     );
   });
 

@@ -1,4 +1,4 @@
-package com.iamkaf.simplerefill;
+package com.iamkaf.minirefill;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
